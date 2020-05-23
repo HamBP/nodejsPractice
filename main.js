@@ -6,14 +6,18 @@ const template = require('./htmlTemplate');
 
 const app = http.createServer((request, response) => {
     console.log('server start!');
+    const pathname = url.parse(request.url, true).pathname;
+    const reqQuery = url.parse(request.url, true).query;
 
-    const article = {
-        title: '제목',
-        content: '내용'
-    };
-
-    if(request.url = '/') {
+    if(pathname == '/') {
+        console.log('id: ', reqQuery.id);
+        const article = template.getArticle(reqQuery.id);
+        response.writeHead(200);
         response.end(template.pageRender(article));
+    }
+    else {
+        response.writeHead(404);
+        response.end()
     }
 });
 

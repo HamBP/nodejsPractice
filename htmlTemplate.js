@@ -5,7 +5,7 @@ let articles = ``;
 fs.readdir('./articles', (err, files) => {
     if(err) throw err;
     files.forEach(file => {
-        articles = articles + `<li><a href="./${file}">${file}</a></li>`;
+        articles = articles + `<li><a href="./?id=${file}">${file}</a></li>`;
     });
 });
 
@@ -72,5 +72,24 @@ module.exports = {
                         </main>        
                     </div>        
                 </body>
-            </html>`;}
+            </html>`;},
+    getArticle: (_title) => {
+        if(_title == undefined) { // 메인 페이지일 경우
+            article = {
+                title: '메인 페이지',
+                content: ''
+            }
+            return article;
+        }
+
+        fs.readFile(`./articles/${_title}`, 'utf8', (err, data) => {
+            if(err) throw err;
+            article = {
+                title: _title,
+                content: data
+            };
+            console.log(article);
+            return article;
+        })
+    }
 }
