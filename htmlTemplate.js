@@ -1,8 +1,16 @@
-const getArticles = require('./getArticles');
+const fs = require('fs');
+
+// 메서드로 만들려 했으나 기술적인 문제로 임시로 전역변수 형태로 넘김.
+let articles = ``;
+fs.readdir('./articles', (err, files) => {
+    if(err) throw err;
+    files.forEach(file => {
+        articles = articles + `<li><a href="./${file}">${file}</a></li>`;
+    });
+});
 
 module.exports = {
     pageRender: (article) => {
-        console.log(getArticles(), '받은값');
         return `
             <!DOCTYPE html>
 
@@ -54,7 +62,7 @@ module.exports = {
                     <div class="wrapper">
                         <aside class="side-bar">
                             <ul class="articles">
-                                ${getArticles()}
+                                ${articles}
                             </ul>
                         </aside>
 
