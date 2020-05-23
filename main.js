@@ -17,7 +17,7 @@ const app = http.createServer((request, response) => {
     }
     else {
         response.writeHead(404);
-        response.end()
+        response.end(template.errorPage404());
     }
 });
 

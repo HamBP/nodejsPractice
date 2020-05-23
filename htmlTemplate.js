@@ -91,5 +91,35 @@ module.exports = {
             console.log(article);
             return article;
         })
+    },
+    errorPage404: () => {
+        return `
+        <!DOCTYPE html>
+
+        <html>
+            <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <meta charset="utf-8">
+                <title>Node js Practice Page</title>
+
+                <style>
+                    body {
+                        text-align: center;
+                        color: #333;
+                    }
+
+                    h1 > a {
+                        color: inherit;
+                        text-decoration: none;
+                    }
+                </style>
+            </head>
+
+            <body>
+                <header class="header">
+                    <h1><a href='/'>404 Not Found</a></h1>
+                </header>   
+            </body>
+        </html>`
     }
 }
