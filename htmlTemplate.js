@@ -1,3 +1,4 @@
+// 가독성을 위해 읽으라는 부분 먼저 읽기를 권장함.
 const fs = require('fs');
 
 // 기술적인 문제로 임시로 객체 바깥에 구현함.   TODO: 객체 내부로 옮길 것.
@@ -9,7 +10,43 @@ const getArticles = () => {
     })
     return articles;
 }
+const controler = {
+    create: `<a class="btn" href='./create'>글 쓰기</a>`,
+    all: `
+    <a class="btn" href='./create'>글 쓰기</a>
+    <a class="btn" href='./update'>수정</a>
+    <a class="btn" href='./delete'>삭제</a>`
+}
+// type 이라는 이름으로 지으려고 했으나 통일성을 위해 article로 지음
+const pageType = (article) => {
+    const _id = article.id;
+    if(_id == 'main') {
+        return `
+            ${controler.create}
+            <h2>${article.title}</h2>
+            <p>${article.content}</p>
+            `;
+    } else if(_id == 'article') {
+        return `
+            ${controler.all}
+            <h2>${article.title}</h2>
+            <p>${article.content}</p>
+            `;
+    } else if(_id == 'create') {
+        return `
+            ${controler.all}
+            <form class="post" action="./create_process" method="POST">
+                <input type="text" name="title" placeholder="title"><br>
+                <textarea name="content" id="" cols="30" rows="10" placeholder="content"></textarea>
+                <button type="submit">저장</button>
+            </form>
+        `;
+    } else {
+        return '404 error';
+    }
+}
 
+// 이 곳부터 읽기 시작하면 된다.
 module.exports = {
     pageRender: (article) => {
         console.log("catch!", article);
@@ -27,10 +64,23 @@ module.exports = {
                             color: #333;
                         }
 
-                        h1 > a {
+                        a {
                             color: inherit;
                             text-decoration: none;
                         }
+                        
+                        a.btn {
+                            padding: 5px;
+                            border: solid 1px;
+                            border-radius: 5px;  
+                            box-shadow: #666 2px 2px;  
+                        }
+
+                        a.btn:hover {
+                            color: white;
+                            background-color: #666;
+                        }
+
                         .wrapper {
                             display: grid;
                             grid-template-columns: 1fr 2fr;
@@ -53,6 +103,11 @@ module.exports = {
                         .articles {
                             list-style: none;
                         }
+
+                        .post {
+                            display: block;
+                            padding: 10px;
+                        }
                     </style>
                 </head>
 
@@ -69,14 +124,14 @@ module.exports = {
                         </aside>
 
                         <main class="main">
-                            <h2>${article.title}</h1>
-                            <p>${article.content}</p>
+                            ${pageType(article)}
                         </main>        
-                    </div>        
+                    </div>     
                 </body>
             </html>`;},
     getArticle: (_title) => {
         let article = {
+            id: 'main',
             title: '메인 페이지',
             content: ''
         };
@@ -86,6 +141,7 @@ module.exports = {
         }
         
         article = {
+            id: 'article',
             title: _title,
             content: fs.readFileSync(`./articles/${_title}`, 'utf8')
         }
