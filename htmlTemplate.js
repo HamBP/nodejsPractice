@@ -1,16 +1,18 @@
 const fs = require('fs');
 
-// 메서드로 만들려 했으나 기술적인 문제로 임시로 전역변수 형태로 넘김.
-let articles = ``;
-fs.readdir('./articles', (err, files) => {
-    if(err) throw err;
+// 기술적인 문제로 임시로 객체 바깥에 구현함.   TODO: 객체 내부로 옮길 것.
+const getArticles = () => {
+    const files = fs.readdirSync(`./articles`);
+    let articles = ``;
     files.forEach(file => {
         articles = articles + `<li><a href="./?id=${file}">${file}</a></li>`;
-    });
-});
+    })
+    return articles;
+}
 
 module.exports = {
     pageRender: (article) => {
+        console.log("catch!", article);
         return `
             <!DOCTYPE html>
 
@@ -62,7 +64,7 @@ module.exports = {
                     <div class="wrapper">
                         <aside class="side-bar">
                             <ul class="articles">
-                                ${articles}
+                                ${getArticles()}
                             </ul>
                         </aside>
 
@@ -74,23 +76,20 @@ module.exports = {
                 </body>
             </html>`;},
     getArticle: (_title) => {
+        let article = {
+            title: '메인 페이지',
+            content: ''
+        };
+        
         if(_title == undefined) { // 메인 페이지일 경우
-            article = {
-                title: '메인 페이지',
-                content: ''
-            }
             return article;
         }
-
-        fs.readFile(`./articles/${_title}`, 'utf8', (err, data) => {
-            if(err) throw err;
-            article = {
-                title: _title,
-                content: data
-            };
-            console.log(article);
-            return article;
-        })
+        
+        article = {
+            title: _title,
+            content: fs.readFileSync(`./articles/${_title}`, 'utf8')
+        }
+        return article;
     },
     errorPage404: () => {
         return `
