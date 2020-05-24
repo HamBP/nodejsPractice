@@ -1,70 +1,7 @@
-// 가독성을 위해 읽으라는 부분 먼저 읽기를 권장함.
 const fs = require('fs');
 
-// 기술적인 문제로 임시로 객체 바깥에 구현함.   TODO: 객체 내부로 옮길 것.
-const getArticles = () => {
-    const files = fs.readdirSync(`./articles`);
-    let articles = ``;
-    files.forEach(file => {
-        articles = articles + `<li><a href="./?id=${file}">${file}</a></li>`;
-    })
-    return articles;
-}
-const controler = {
-    none: ``,
-    create: `<a class="btn" href='./create'>글 쓰기</a>`,
-    all: (article) => {
-        return `
-            <a class="btn" href='./create'>글 쓰기</a>
-            <a class="btn" href='./update?id=${article.title}'>수정</a>
-            <form action="./delete_process" method="post">
-                <input type="hidden" name="title" value="${article.title}">
-                <button class="btn" type="submit">삭제</button>
-            </form>`;}
-}
-// type 이라는 이름으로 지으려고 했으나 통일성을 위해 article로 지음
-const pageType = (article) => {
-    const _id = article.id;
-    if(_id == 'main') {
-        return `
-            ${controler.create}
-            <h2>${article.title}</h2>
-            <p>${article.content}</p>
-            `;
-    } else if(_id == 'article') {
-        return `
-            ${controler.all(article)}
-            <h2>${article.title}</h2>
-            <p>${article.content}</p>
-            `;
-    } else if(_id == 'create') {
-        return `
-            ${controler.none}
-            <form class="post" action="./create_process" method="POST">
-                <input type="text" name="title" placeholder="title"><br>
-                <textarea name="content" id="" cols="30" rows="10" placeholder="content"></textarea>
-                <button type="submit">저장</button>
-            </form>
-        `;
-    } else if(_id == 'update') {
-        return `
-            ${controler.none}
-            <form class="post" action="./update_process" method="POST">
-                <input type="hidden" name="oldTitle" value="${article.title}"><br>
-                <input type="text" name="title" value="${article.title}"><br>
-                <textarea name="content" id="" cols="30" rows="10">${article.content}</textarea>
-                <button type="submit">저장</button>
-            </form>
-        `;
-    } else {
-        return '404 error';
-    }
-}
-
-// 이 곳부터 읽기 시작하면 된다.
 module.exports = {
     pageRender: (article) => {
-        console.log("function(pageRander): ", article);
         return `
             <!DOCTYPE html>
 
@@ -146,27 +83,25 @@ module.exports = {
                         </aside>
 
                         <main class="main">
-                            ${pageType(article)}
+                            ${getPage(article)}
                         </main>        
                     </div>     
                 </body>
             </html>`;},
     getArticle: (_title) => {
-        console.log('function(getArticle): ', _title);
-        let article = {
-            id: 'main',
-            title: '메인 페이지',
-            content: ''
-        };
-        
-        if(_title == undefined) { // 메인 페이지일 경우
-            return article;
+        if(_title == undefined) {   // 메인 페이지인 경우
+            article = {
+                id: 'main',
+                title: '메인 페이지',
+                content: ''
+            };
         }
-        
-        article = {
-            id: 'article',
-            title: _title,
-            content: fs.readFileSync(`./articles/${_title}`, 'utf8')
+        else {                      // 글 페이지인 경우
+            article = {
+                id: 'article',
+                title: _title,
+                content: fs.readFileSync(`./articles/${_title}`, 'utf8')
+            }
         }
         return article;
     },
@@ -200,4 +135,61 @@ module.exports = {
             </body>
         </html>`
     }
+}
+
+const getArticles = () => {
+    const files = fs.readdirSync(`./articles`);
+    let articles = ``;
+    files.forEach(file => {
+        articles = articles + `<li><a href="./?title=${file}">${file}</a></li>`;
+    })
+    return articles;
+}
+
+const getPage = (article) => {
+    const _id = article.id;
+    switch(_id) {
+        case 'main':
+            return `
+                ${controler.create}
+                <h2>${article.title}</h2>
+                <p>${article.content}</p>`;
+        case 'article': 
+            return `
+                ${controler.all(article)}
+                <h2>${article.title}</h2>
+                <p>${article.content}</p>`;
+        case 'create':
+            return `
+                ${controler.none}
+                <form class="post" action="./create_process" method="POST">
+                    <input type="text" name="title" placeholder="title"><br>
+                    <textarea name="content" cols="30" rows="10" placeholder="content"></textarea>
+                    <button type="submit">저장</button>
+                </form>`;
+        case 'update':
+            return `
+                ${controler.none}
+                <form class="post" action="./update_process" method="POST">
+                    <input type="hidden" name="oldTitle" value="${article.title}"><br>
+                    <input type="text" name="title" value="${article.title}"><br>
+                    <textarea name="content" cols="30" rows="10">${article.content}</textarea>
+                    <button type="submit">저장</button>
+                </form>`;
+        default:
+            return '404 error';
+    }
+}
+
+const controler = {
+    none: ``,
+    create: `<a class="btn" href='./create'>글 쓰기</a>`,
+    all: (article) => {
+        return `
+            <a class="btn" href='./create'>글 쓰기</a>
+            <a class="btn" href='./update?title=${article.title}'>수정</a>
+            <form action="./delete_process" method="post">
+                <input type="hidden" name="title" value="${article.title}">
+                <button class="btn" type="submit">삭제</button>
+            </form>`;}
 }
