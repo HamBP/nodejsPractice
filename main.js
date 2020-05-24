@@ -16,8 +16,7 @@ const app = http.createServer((request, response) => {
         const article = template.getArticle(reqQuery.id);
         response.writeHead(200);
         response.end(template.pageRender(article));
-    }
-    else if(pathname == '/create') {
+    } else if(pathname == '/create') {
         console.log('id: ', reqQuery.id);
         const article = {
             id: 'create'
@@ -30,7 +29,7 @@ const app = http.createServer((request, response) => {
             queryString = queryString + data;
         })
         request.on('end', () => {
-            let queryData = qs.parse(QueryString);
+            let queryData = qs.parse(queryString);
             console.log(queryData);
             fs.writeFile(`./articles/${queryData.title}`, queryData.content, 'utf8', (err) => {
                 if(err) throw err;
@@ -39,7 +38,27 @@ const app = http.createServer((request, response) => {
             });
         })
     } else if(pathname == '/update') {
+        console.log('id: ', reqQuery.id);
+        let article = template.getArticle(reqQuery.id);
+        article.id = "update";
+        response.writeHead(200);
+        response.end(template.pageRender(article));
     } else if(pathname == '/update_process') {
+        let queryString = ``;
+        request.on('data', data => {
+            queryString = queryString + data;
+        })
+        request.on('end', () => {
+            let queryData = qs.parse(queryString);
+            console.log('queryData: ', queryData);
+            fs.rename(`./articles/${queryData.oldTitle}`, `./articles/${queryData.title}`, (err) => {
+                if(err) throw err
+                fs.writeFile(`./articles/${queryData.title}`, queryData.content, 'utf8', () => {
+                    response.writeHead(302, {Location: `/?id=${queryData.title}`});
+                    response.end();
+                })
+            });
+        })
     } else if(pathname == '/delete_process') {
         let queryString = ``
         request.on('data', data => {

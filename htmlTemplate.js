@@ -16,7 +16,7 @@ const controler = {
     all: (article) => {
         return `
             <a class="btn" href='./create'>글 쓰기</a>
-            <a class="btn" href='./update'>수정</a>
+            <a class="btn" href='./update?id=${article.title}'>수정</a>
             <form action="./delete_process" method="post">
                 <input type="hidden" name="title" value="${article.title}">
                 <button class="btn" type="submit">삭제</button>
@@ -46,6 +46,16 @@ const pageType = (article) => {
                 <button type="submit">저장</button>
             </form>
         `;
+    } else if(_id == 'update') {
+        return `
+            ${controler.none}
+            <form class="post" action="./update_process" method="POST">
+                <input type="hidden" name="oldTitle" value="${article.title}"><br>
+                <input type="text" name="title" value="${article.title}"><br>
+                <textarea name="content" id="" cols="30" rows="10">${article.content}</textarea>
+                <button type="submit">저장</button>
+            </form>
+        `;
     } else {
         return '404 error';
     }
@@ -54,7 +64,7 @@ const pageType = (article) => {
 // 이 곳부터 읽기 시작하면 된다.
 module.exports = {
     pageRender: (article) => {
-        console.log("catch!", article);
+        console.log("function(pageRander): ", article);
         return `
             <!DOCTYPE html>
 
@@ -142,6 +152,7 @@ module.exports = {
                 </body>
             </html>`;},
     getArticle: (_title) => {
+        console.log('function(getArticle): ', _title);
         let article = {
             id: 'main',
             title: '메인 페이지',
