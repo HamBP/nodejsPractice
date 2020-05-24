@@ -11,11 +11,16 @@ const getArticles = () => {
     return articles;
 }
 const controler = {
+    none: ``,
     create: `<a class="btn" href='./create'>글 쓰기</a>`,
-    all: `
-    <a class="btn" href='./create'>글 쓰기</a>
-    <a class="btn" href='./update'>수정</a>
-    <a class="btn" href='./delete'>삭제</a>`
+    all: (article) => {
+        return `
+            <a class="btn" href='./create'>글 쓰기</a>
+            <a class="btn" href='./update'>수정</a>
+            <form action="./delete_process" method="post">
+                <input type="hidden" name="title" value="${article.title}">
+                <button class="btn" type="submit">삭제</button>
+            </form>`;}
 }
 // type 이라는 이름으로 지으려고 했으나 통일성을 위해 article로 지음
 const pageType = (article) => {
@@ -28,13 +33,13 @@ const pageType = (article) => {
             `;
     } else if(_id == 'article') {
         return `
-            ${controler.all}
+            ${controler.all(article)}
             <h2>${article.title}</h2>
             <p>${article.content}</p>
             `;
     } else if(_id == 'create') {
         return `
-            ${controler.all}
+            ${controler.none}
             <form class="post" action="./create_process" method="POST">
                 <input type="text" name="title" placeholder="title"><br>
                 <textarea name="content" id="" cols="30" rows="10" placeholder="content"></textarea>
@@ -69,14 +74,21 @@ module.exports = {
                             text-decoration: none;
                         }
                         
-                        a.btn {
+                        form {
+                            display: inline;
+                        }
+
+                        .btn {
+                            background-color: white;
+                            color: inherit;
+                            font-size: 16px;
                             padding: 5px;
                             border: solid 1px;
                             border-radius: 5px;  
                             box-shadow: #666 2px 2px;  
                         }
 
-                        a.btn:hover {
+                        .btn:hover {
                             color: white;
                             background-color: #666;
                         }

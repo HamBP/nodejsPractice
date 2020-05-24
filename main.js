@@ -24,20 +24,34 @@ const app = http.createServer((request, response) => {
         };
         response.writeHead(200);
         response.end(template.pageRender(article));
-    }
-    else if(pathname == '/create_process') {
-        let body = ``;
+    } else if(pathname == '/create_process') {
+        let queryString = ``;
         request.on('data', data => {
-            body = body + data;
+            queryString = queryString + data;
         })
         request.on('end', () => {
-            queryData = qs.parse(body);
+            let queryData = qs.parse(QueryString);
             console.log(queryData);
             fs.writeFile(`./articles/${queryData.title}`, queryData.content, 'utf8', (err) => {
                 if(err) throw err;
                 response.writeHead(302, {Location: `/?id=${queryData.title}`});
                 response.end();
             });
+        })
+    } else if(pathname == '/update') {
+    } else if(pathname == '/update_process') {
+    } else if(pathname == '/delete_process') {
+        let queryString = ``
+        request.on('data', data => {
+            queryString = queryString + data;
+        })
+        request.on('end', () => {
+            let queryData = qs.parse(queryString);
+            console.log('삭제: ', queryData);
+            fs.unlink(`./articles/${queryData.title}`, () => {
+                response.writeHead(302, {Location: `/`});
+                response.end();
+            })
         })
     } else {
         response.writeHead(404);
